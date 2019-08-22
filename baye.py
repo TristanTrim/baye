@@ -1,4 +1,21 @@
+search_range = (100,101)
 
+bayesquares = set()
+
+def normalize(tu,a,ba,bna):
+    if((tu-a)<a):
+        a=tu-a
+        ba,bna = bna,ba
+    if((tu-ba)<ba):
+        ba=tu-ba
+        bna=tu-bna
+    elif((tu-ba)==ba):
+        if((tu-bna)<bna):
+            bna=tu-bna
+    if((tu-a)==a):
+        if(bna<ba):
+            ba,bna = bna,ba
+    return(tu,a,ba,bna)
 
 
 def fa(tu,b,ab,anb):
@@ -79,7 +96,7 @@ def draw_b_probs(tu,b,ab,anb):
         string+="\n"
     return(string)
 
-for tu in range(15, 16):
+for tu in range(*search_range):
     ## only count halfway because the other half is symmetrical
     for b in range(1,int(tu/2)+1):
         for ab in range(1,tu):
@@ -94,13 +111,36 @@ for tu in range(15, 16):
                    #and not all([b==a,ab==ba,anb==bna])
                    #and not anb==tu-ba
                     ):
-                        square,pluses = draw_probs(tu,b,ab,anb, a,ba,bna)
-                        if(pluses==2):
-                            print("tu={},b={},a|b={},a|nb={}".format(tu,b,ab,anb))
-                            print("a={},b|a={},b|na={}".format(a,ba,bna))
-#                            print(square)
-                            print()
+                        bayesquares.add(normalize(tu,a,ba,bna))
+                        #square,pluses = draw_probs(tu,b,ab,anb, a,ba,bna)
+                        #if(pluses==2):
+                        #    print("tu={},b={},a|b={},a|nb={}".format(tu,b,ab,anb))
+                        #    print("a={},b|a={},b|na={}".format(a,ba,bna))
+#                       #     print(square)
+                        #    print()
              #  else:
              #          print(draw_b_probs(tu,b,ab,anb))
+
+count = 0
+for square in bayesquares:
+
+    tu,b,ab,anb = square
+
+    a=fa(tu,b,ab,anb)
+    ba=fba(tu,b,ab,anb)
+    bna=fbna(tu,b,ab,anb)
+
+    square_drawing,pluses = draw_probs(tu,b,ab,anb,  a,ba,bna)
+    if(pluses==2
+        and (normalize(tu,a,ba,bna) != normalize(tu,b,ab,anb))
+            ):
+        count+=1
+        print("tu={},b={},a|b={},a|nb={}".format(tu,b,ab,anb))
+        print("a={},b|a={},b|na={}".format(a,ba,bna))
+        print(square_drawing)
+        print()
+
+print("that was {} matches!".format(count))
+
 
 
