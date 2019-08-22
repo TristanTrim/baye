@@ -1,4 +1,4 @@
-search_range = (100,101)
+search_range = (12,13)
 
 bayesquares = set()
 
@@ -9,6 +9,9 @@ bayesquares = set()
 # na # q3 # q4 #
 #    ###########
 #     bna  nbna
+
+def whole_number(x):
+    return(abs(x-round(x)) < 0.00001)
 
 class bayesquare:
     def __init__(self, tu, a, ba, bna):
@@ -87,21 +90,23 @@ class bayesquare:
     def draw(self):
         pluses=0
         string=""
+        string+="a={},b|a={},b|na={}\t".format(self.a,self.ba,self.bna)
+        string+="tu={},b={},a|b={},a|nb={}\n".format(self.tu,self.b,self.ab,self.anb)
         for y in range(0,self.tu+1):
 
             # B probs
             for x in range(0,self.tu+1):
-                if(y<self.b):
-                    if(x==self.ab):
+                if(y<self.a):
+                    if(x==self.ba):
                         string+="|"
                     else:
                         string+=" "
-                elif(y>self.b):
-                    if(x==self.anb):
+                elif(y>self.a):
+                    if(x==self.bna):
                         string+="|"
                     else:
                         string+=" "
-                elif(x==self.ab or x==self.anb):
+                elif(x==self.ba or x==self.bna):
                     string+="+"
                     pluses+=1
                 else:
@@ -110,17 +115,17 @@ class bayesquare:
 
             # A probs
             for x in range(0,self.tu+1):
-                if(x<self.a):
-                    if(y==self.ba):
+                if(x<self.b):
+                    if(y==self.ab):
                         string+="-"
                     else:
                         string+=" "
-                elif(x>self.a):
-                    if(y==self.bna):
+                elif(x>self.b):
+                    if(y==self.anb):
                         string+="-"
                     else:
                         string+=" "
-                elif(y==self.ba or y==self.bna):
+                elif(y==self.ab or y==self.anb):
                     string+="+"
                 else:
                     string+="|"
@@ -128,8 +133,9 @@ class bayesquare:
             string+="\n"
         return(string, pluses)
 
-bs = bayesquare(100,50,10,40)
-print(bs.draw()[0])
+    def check_whole_nums(self):
+        return(all((whole_number(x) for x in (self.a,self.b,self.ba,self.bna,self.ab,self.anb))))
+
 
 
 ## probs mostly garbage down there...
@@ -173,8 +179,6 @@ def fba(tu,b,ab,anb):
 def fbna(tu,b,ab,anb):
     return( ((tu - ab)*b)/(tu-a) )
 
-def whole_number(x):
-    return(abs(x-round(x)) < 0.00001)
 
 def draw_probs(tu,b,ab,anb, a,ba,bna):
     pluses=0
@@ -242,34 +246,38 @@ def draw_b_probs(tu,b,ab,anb):
         string+="\n"
     return(string)
 
-#for tu in range(*search_range):
-#    ## only count halfway because the other half is symmetrical
-#    for b in range(1,int(tu/2)+1):
-#        for ab in range(1,tu):
-#            for anb in range(1,tu):
-#                if(some condition)
-#                        bayesquares.add(normalize(tu,a,ba,bna))
+#bs = bayesquare(100,50,10,40)
+#print(bs.draw()[0])
 
-#count = 0
-#for square in bayesquares:
-#
-#    tu,b,ab,anb = square
-#
-#    a=fa(tu,b,ab,anb)
-#    ba=fba(tu,b,ab,anb)
-#    bna=fbna(tu,b,ab,anb)
-#
-#    square_drawing,pluses = draw_probs(tu,b,ab,anb,  a,ba,bna)
-#    if(pluses==2
-#        and (normalize(tu,a,ba,bna) != normalize(tu,b,ab,anb))
-#            ):
-#        count+=1
-#        print("tu={},b={},a|b={},a|nb={}".format(tu,b,ab,anb))
-#        print("a={},b|a={},b|na={}".format(a,ba,bna))
-#        print(square_drawing)
-#        print()
-#
-#print("that was {} matches!".format(count))
+if __name__ == "__main__":
+    for tu in range(*search_range):
+        ## only count halfway because the other half is symmetrical
+        for a in range(1,int(tu/2)+1):
+            for ba in range(1,tu):
+                for bna in range(1,tu):
+                    square = bayesquare(tu,a,ba,bna)
+                    if square.check_whole_nums():
+                        bayesquares.add(square)
+                 #   if(some condition)
+                 #           bayesquares.add(normalize(tu,a,ba,bna))
+
+
+    count = 0
+    for square in bayesquares:
+
+        square_drawing,pluses = square.draw()
+        count+=1
+        print(square_drawing)
+    #    if(pluses==2
+    #        and (normalize(tu,a,ba,bna) != normalize(tu,b,ab,anb))
+    #            ):
+    #        count+=1
+    #        print("tu={},b={},a|b={},a|nb={}".format(tu,b,ab,anb))
+    #        print("a={},b|a={},b|na={}".format(a,ba,bna))
+    #        print(square_drawing)
+    #        print()
+
+    print("that was {} matches!".format(count))
 
 
 
