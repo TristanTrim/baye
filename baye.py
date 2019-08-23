@@ -20,7 +20,7 @@ class bayesquare:
         self.ba = ba
         self.bna = bna
 
-        self.normalize()
+        #self.normalize()
 
     def compute_extras(self):
         self.nba = self.tu-self.ba
@@ -47,9 +47,9 @@ class bayesquare:
         qs = (self.q1,self.q2,self.q3,self.q4)
 
         for i in range(0,4):
-            if qs[maxind] > maxval:
-                maxval = qs[maxind]
+            if qs[i] > maxval:
                 maxind = i
+                maxval = qs[i]
         #qs = qs[maxind:]+qs[:maxind]
         if(maxind == 1):
             self.rot_right_90()
@@ -256,15 +256,17 @@ if __name__ == "__main__":
             for ba in range(1,tu):
                 for bna in range(1,tu):
                     square = bayesquare(tu,a,ba,bna)
+                    square.normalize()
                     if square.check_whole_nums():
-                        bayesquares.add(square)
+                        bayesquares.add((square.tu,square.a,square.ba,square.bna))
                  #   if(some condition)
                  #           bayesquares.add(normalize(tu,a,ba,bna))
 
 
     count = 0
-    for square in bayesquares:
-
+    for squarevals in sorted(bayesquares):
+        square = bayesquare(*squarevals)
+        square.compute_extras()
         square_drawing,pluses = square.draw()
         count+=1
         print(square_drawing)
