@@ -1,4 +1,4 @@
-search_range = (12,13)
+search_range = (2,17)
 
 bayesquares = set()
 
@@ -90,8 +90,9 @@ class bayesquare:
     def draw(self):
         pluses=0
         string=""
+        string+="tu={}\t".format(self.tu)
         string+="a={},b|a={},b|na={}\t".format(self.a,self.ba,self.bna)
-        string+="tu={},b={},a|b={},a|nb={}\n".format(self.tu,self.b,self.ab,self.anb)
+        string+="b={},a|b={},a|nb={}\n".format(self.b,self.ab,self.anb)
         for y in range(0,self.tu+1):
 
             # B probs
@@ -268,8 +269,9 @@ if __name__ == "__main__":
         square = bayesquare(*squarevals)
         square.compute_extras()
         square_drawing,pluses = square.draw()
-        count+=1
-        print(square_drawing)
+        if pluses == 2:
+            count+=1
+            print(square_drawing)
     #    if(pluses==2
     #        and (normalize(tu,a,ba,bna) != normalize(tu,b,ab,anb))
     #            ):
