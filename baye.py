@@ -1,6 +1,6 @@
-search_range = (2,17)
+search_range = (2,101)
 
-bayesquares = set()
+bayesquares = {}
 
 #      ba   bna
 #    ###########
@@ -252,6 +252,8 @@ def draw_b_probs(tu,b,ab,anb):
 
 if __name__ == "__main__":
     for tu in range(*search_range):
+        size = f"{tu}x{tu}"
+        bayesquares[size] = set()
         ## only count halfway because the other half is symmetrical
         for a in range(1,int(tu/2)+1):
             for ba in range(1,tu):
@@ -259,18 +261,30 @@ if __name__ == "__main__":
                     square = bayesquare(tu,a,ba,bna)
                     square.normalize()
                     if square.check_whole_nums():
-                        bayesquares.add((square.tu,square.a,square.ba,square.bna))
+                        bayesquares[size].add((square.tu,square.a,square.ba,square.bna))
                  #   if(some condition)
                  #           bayesquares.add(normalize(tu,a,ba,bna))
 
 
-    count = 0
-    for squarevals in sorted(bayesquares):
+    countsizes = 0
+    for tu in range(*search_range):
+      count = 0
+      size = f"{tu}x{tu}"
+      drawings = []
+      for squarevals in sorted(bayesquares[size]):
         square = bayesquare(*squarevals)
         square.compute_extras()
         square_drawing,pluses = square.draw()
         if pluses == 2:
             count+=1
+            drawings += [square_drawing]
+      if count:
+        countsizes += 1
+        print(f"\n## {size} -- {count} squares found --\n")
+        for square_drawing in drawings:
+          if (tu > 12):
+            print(square_drawing.split("\n"[0]))
+          else:
             print(square_drawing)
     #    if(pluses==2
     #        and (normalize(tu,a,ba,bna) != normalize(tu,b,ab,anb))
@@ -281,7 +295,7 @@ if __name__ == "__main__":
     #        print(square_drawing)
     #        print()
 
-    print("that was {} matches!".format(count))
+    print(f"\n\nFound {countsizes} grid sizes with good probability values")
 
 
 
